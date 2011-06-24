@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script src="./jquery.fantastical.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+      $(function() { 
+        $("#source input[type='text']").focus();
+        $("#source input[type='text']").fantastical(); 
+      });
+    </script>
+    
+    <style type="text/css">
+      body {
+        margin: 0 auto;
+        text-align: center;
+        width: 100%;
+        font-family: Helvetica, Ariel, sans-serif
+      }
+      
+      div.container {
+        margin: 0 auto;
+        text-align: left;
+        padding: 100px;
+      }
+      
+      div.wrapper {
+        margin: 0 auto;
+        padding-top: 40px;
+        width: 600px;
+        color: #aaa;
+      }
+      
+      div.highlight {
+        border: solid 3px #aaa;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        min-height: 100px;
+      }
+      
+      div.inner {
+        color: #000;
+        padding: 10px;
+      }
+      
+      #source input[type='text'] {
+        font-size: 30px;
+        width: 500px;
+        padding: 3px;
+        background-color: transparent;
+        border: none;
+        border-bottom: dotted 1px #000;
+      }
+      
+      #source input[type='text']:focus {
+        outline: 0 none;
+      }
+      
+      #temp {
+        display: block;
+        position: relative;
+      }
+    </style>
+  <head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        Source:
+        <div id="source" class="highlight">
+          <div class="inner">
+            <input type="text" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="wrapper">
+        Destination:
+        <div id="destination" class="highlight">
+          <div class="inner">
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
