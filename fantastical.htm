@@ -6,7 +6,7 @@
     <script type="text/javascript">
       $(function() { 
         $("#source input[type='text']").focus();
-        $("#source input[type='text']").fantastical(); 
+        $("#source input[type='text']").fantastical($("#destination .inner span")); 
       });
     </script>
     
@@ -45,6 +45,8 @@
       
       #source input[type='text'] {
         font-size: 30px;
+		font-family: "Georgia";
+		color: #999;
         width: 500px;
         padding: 3px;
         background-color: transparent;
