@@ -1,81 +1,124 @@
 (function( $ ) {
-  $.fn.fantastical = function( destination, options ) {
-    var pattern = /(\w+)[.!?]?\s*$/;
-    var character_offset = 10;	// TODO: Calculate the width of a character based on the style of the temp width
-	var idleTimer = null;
-	var moved = false;
 
-    var settings = {
-		'idleWaitTime'	: 2000
-	};
-    
-    return this.each(function() {
-      var $this = $(this);
+  var settings = {
+	'destination'	: $('#destination'),
+	'idleWaitTime'	: 2000
+  };
 
-	  if ( options ) { 
-		$.extend( settings, options );
-	  }
+  var methods = {
+	init : function( options ) { 
+		
+		return this.each(function() {
+	      var $this = $(this);
+		  var data = $this.data('fantastical');
 
-	  function idle() {
-		move();
-	  }
-	
-	  function move() {
-		if (!moved) {
-		  var match = pattern.exec($this.val());
-          if (match[0]) {
-            // move text from source to destination
-            $this.parent().append("<span id='__temp'>" + match[0] + "</span>");
-            var temp = $this.parent().children("#__temp");
-  		    // copy the css from the source
-	  	    temp.css("font-size", $this.css("font-size"));
-		    temp.css("font-weight", $this.css("font-weight"));
-		    temp.css("font-family", $this.css("font-family"));
-		    temp.css("color", $this.css("color"));
+		  if ( options ) { 
+			$.extend( settings, options );
+		  }
+		
+		  if ( ! data ) {
+			$(this).data('fantastical', {
+				pattern 	: /(\w+)[.!?]?\s*$/,
+				offset		: 10,
+				idleTimer	: null,
+				moved		: false
+			});
+		  }
+		
+		  $this.bind('keyup.fantastical', methods.keyup);
+		})
+		
+	},
+	keyup : function( event ) { 
+		if (!settings.destination) { return; }
+		
+		var $this = $(this);
+		var data = $this.data('fantastical');
 
-		    var left = $this.offset().left + ($this.caret() * character_offset);
-		    if ((($this.caret() * character_offset) + (match[0].length * character_offset)) > $this.width()) {
-			  left = ($this.offset().left + $this.width()) - (match[0].length * character_offset);
-		    }
-            var offset = { top: $this.offset().top, left: left };
-            temp.offset( offset );
-            var from = temp.offset();
+		if (data.idleTimer) {
+			clearTimeout(data.idleTimer);
+		}
 
-			// The destination must have some content if it is an inline element to get the offset
-			if (destination.html().length == 0) {
-				destination.html(".");
+		if (event.keyCode == '32') {
+			$this.one('move.fantastical', methods.move);
+			$this.trigger('move.fantastical');
+		} else {
+		  data.moved = false;
+		  data.idleTimer = setTimeout(function( ) { 
+			$this.one('move.fantastical', methods.move);
+			$this.trigger('move.fantastical');
+		  }, settings.idleWaitTime);
+		}
+	},
+	move : function( ) {
+		var $this = $(this);
+		var data = $this.data('fantastical');
+		
+		if (!data.moved) {
+			var match = data.pattern.exec($this.val());
+			if (match && match[0]) {
+				// move text from source to destination
+				$this.parent().append("<span id='__temp'>" + match[0] + "</span>");
+				var temp = $this.parent().children("#__temp");
+			
+				// copy the css from the source
+				temp.css("font-size", $this.css("font-size"));
+				temp.css("font-weight", $this.css("font-weight"));
+				temp.css("font-family", $this.css("font-family"));
+				temp.css("color", $this.css("color"));
+			
+				var left = $this.offset().left + ($this.caret() * data.offset);
+				if ((($this.caret() * data.offset) + (match[0].length * data.offset)) > $this.width()) {
+					left = ($this.offset().left + $this.width()) - (match[0].length * data.offset);
+				}
+			
+				var offset = { top: $this.offset().top, left: left };
+				temp.offset( offset );
+				var from = temp.offset();
+			
+				// The destination must have some content if it is an inline element to get the offset
+				if (settings.destination.html().length == 0) {
+					settings.destination.html(".");
+				}
+				var to = settings.destination.offset();
+				var width = settings.destination.width();
+			
+				var top = "+=" + (to.top - from.top) + "px";
+				left = "+=" + ((to.left + width) - from.left) + "px";
+			
+				temp.animate({top: top, left: left}, function() {
+					settings.destination.html($this.val());
+			 		temp.remove();
+			    	data.moved = true;
+			 	});
 			}
-            var to = destination.offset();
-            var width = destination.width();
-
-            var top = "+=" + (to.top - from.top) + "px";
-            left = "+=" + ((to.left + width) - from.left) + "px";
-
-            temp.animate({top: top, left: left}, function() {
-              destination.html($this.val());
-              temp.remove();
-              moved = true;
-            });
-          }
 		}
-	  }
-      
-      $this.keyup(function(event) {
-		if (!destination) { return; }
+	},
+	destroy : function( ) { 
 		
-		if (idleTimer) {
-			clearTimeout(idleTimer);
-		}
-		
-        if (event.keyCode == '32') {
-		  move();
-        } else {
-	        moved = false;
-			idleTimer = setTimeout(idle, settings.idleWaitTime);
-		}
+		return this.each(function(){
+			var $this = $(this);
+			var data = $this.data('fantastical');
+			if (data.idleTimer) {
+				clearTimeout(data.idleTimer);
+			}
 
-      });
-	});
+			$this.unbind('.fantastical');
+			$this.removeData('fantastical');
+		})
+	}
+  };
+	
+  $.fn.fantastical = function( method ) {
+	
+	// Method calling logic
+	if ( methods[method] ) {
+		return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+	} else if ( typeof method === 'object' || ! method ) {
+		return methods.init.apply( this, arguments );
+	} else {
+		$.error( 'Method ' +  method + ' does not exist on jQuery.fantastical' );
+	}
   };
 })( jQuery );
 

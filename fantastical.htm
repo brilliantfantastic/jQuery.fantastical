@@ -6,7 +6,19 @@
     <script type="text/javascript">
       $(function() { 
         $("#source input[type='text']").focus();
-        $("#source input[type='text']").fantastical($("#destination .inner span")); 
+        $("#source input[type='text']").fantastical({ destination: $("#destination .inner span") });
+
+		$("#lnkToggleLink").click(function(event) {
+			if ($(event.target).text() == "unlink") {
+				$("#source input[type='text']").fantastical('destroy');
+				$(event.target).text("link");
+				$("#source input[type='text']").focus();
+			} else {
+				$("#source input[type='text']").fantastical({ destination: $("#destination .inner span") });
+				$(event.target).text("unlink");
+				$("#source input[type='text']").focus();
+			}
+		})
       });
     </script>
     
@@ -73,6 +85,9 @@
             <input type="text" />
           </div>
         </div>
+        <div>
+			<a href="#" id="lnkToggleLink">unlink</a>
+		</div>
       </div>
       
       <div class="wrapper">
