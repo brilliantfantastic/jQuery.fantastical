@@ -3,7 +3,7 @@
   var settings = {
 	'destination'	: $('#destination'),
 	'idleWaitTime'	: 2000,
-	'beforeSet'		: function( value ) { return value; }
+	'beforeSet'		: function( value, addition ) { return value; }
   };
 
   var methods = {
@@ -88,7 +88,7 @@
 				left = "+=" + ((to.left + width) - from.left) + "px";
 			
 				temp.animate({top: top, left: left}, function() {
-					settings.destination.html(settings.beforeSet($this.val()));
+					settings.destination.html(settings.beforeSet($this.val(), match[0]));
 			 		temp.remove();
 			    	data.moved = true;
 			 	});
