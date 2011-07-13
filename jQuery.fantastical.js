@@ -2,7 +2,8 @@
 
   var settings = {
 	'destination'	: $('#destination'),
-	'idleWaitTime'	: 2000
+	'idleWaitTime'	: 2000,
+	'beforeSet'		: function( value ) { return value; }
   };
 
   var methods = {
@@ -87,7 +88,7 @@
 				left = "+=" + ((to.left + width) - from.left) + "px";
 			
 				temp.animate({top: top, left: left}, function() {
-					settings.destination.html($this.val());
+					settings.destination.html(settings.beforeSet($this.val()));
 			 		temp.remove();
 			    	data.moved = true;
 			 	});
